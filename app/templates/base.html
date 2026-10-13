@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Campus Lost and Found - A centralized platform for college campus students and staff to report, track, and recover lost belongings.">
+    <title>{% block title %}Campus Lost & Found{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Custom Application CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Accessibility Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm" aria-label="Main Navigation">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+                <i class="bi bi-search-heart fs-4 text-warning" aria-hidden="true"></i>
+                <span class="fw-bold">Campus Lost &amp; Found</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                            <i class="bi bi-house-door me-1" aria-hidden="true"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'items.lost_items' %}active{% endif %}" href="{{ url_for('items.lost_items') }}">
+                            <i class="bi bi-tag me-1 text-danger-subtle" aria-hidden="true"></i>Lost Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'items.found_items' %}active{% endif %}" href="{{ url_for('items.found_items') }}">
+                            <i class="bi bi-check-circle me-1 text-success-subtle" aria-hidden="true"></i>Found Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}#how-it-works">
+                            <i class="bi bi-info-circle me-1" aria-hidden="true"></i>How It Works
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}" href="{{ url_for('auth.dashboard') }}">
+                            <i class="bi bi-speedometer2 me-1" aria-hidden="true"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'items.my_items' %}active{% endif %}" href="{{ url_for('items.my_items') }}">
+                            <i class="bi bi-collection me-1" aria-hidden="true"></i>My Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'auth.profile' %}active{% endif %}" href="{{ url_for('auth.profile') }}">
+                            <i class="bi bi-person me-1" aria-hidden="true"></i>Profile
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('items.report_choice') }}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-plus-circle me-1" aria-hidden="true"></i>Report Item
+                    </a>
+                    {% if current_user.is_authenticated %}
+                        <span class="badge bg-light text-dark px-3 py-2 d-none d-md-inline-flex align-items-center gap-1 shadow-sm">
+                            <i class="bi bi-person-circle text-primary" aria-hidden="true"></i>
+                            <span>{{ current_user.name }}</span>
+                            <span class="badge bg-primary text-white ms-1">{{ current_user.role|capitalize }}</span>
+                        </span>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Log Out
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>Log In
+                        </a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-warning btn-sm text-dark fw-bold">
+                            <i class="bi bi-person-plus me-1" aria-hidden="true"></i>Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Consistent Flash Messages Container -->
+    <div class="container mt-3" aria-live="polite">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set alert_type = 'danger' if category in ['error', 'danger'] else ('warning' if category == 'warning' else ('success' if category == 'success' else 'info')) %}
+                    <div class="alert alert-{{ alert_type }} alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+                        <i class="bi {% if alert_type == 'success' %}bi-check-circle-fill{% elif alert_type == 'danger' %}bi-exclamation-triangle-fill{% elif alert_type == 'warning' %}bi-exclamation-circle-fill{% else %}bi-info-circle-fill{% endif %} me-2 fs-5" aria-hidden="true"></i>
+                        <div class="flex-grow-1">{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close notification"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto">
+        <div class="container">
+            <div class="row g-4 justify-content-between">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-search-heart fs-4 text-warning" aria-hidden="true"></i>
+                        <span class="fs-5 fw-bold text-white">Campus Lost &amp; Found</span>
+                    </div>
+                    <p class="small text-muted mb-3">
+                        A centralized platform connecting students, faculty, and campus safety officers to swiftly recover lost items across university grounds.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-secondary">Bootstrap 5</span>
+                        <span class="badge bg-secondary">Flask 3</span>
+                        <span class="badge bg-secondary">SQLite</span>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="text-white fw-bold mb-3">Quick Navigation</h6>
+                    <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
+                        <li><a href="{{ url_for('index') }}"><i class="bi bi-chevron-right me-1 text-primary"></i>Home</a></li>
+                        <li><a href="{{ url_for('items.lost_items') }}"><i class="bi bi-chevron-right me-1 text-primary"></i>Lost Items</a></li>
+                        <li><a href="{{ url_for('items.found_items') }}"><i class="bi bi-chevron-right me-1 text-primary"></i>Found Items</a></li>
+                        <li><a href="{{ url_for('index') }}#how-it-works"><i class="bi bi-chevron-right me-1 text-primary"></i>How It Works</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="text-white fw-bold mb-3">Campus Assistance</h6>
+                    <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
+                        <li><i class="bi bi-geo-alt me-2 text-warning"></i>Student Center, Room 104</li>
+                        <li><i class="bi bi-clock me-2 text-warning"></i>Mon - Fri: 8:00 AM - 5:00 PM</li>
+                        <li><i class="bi bi-shield-check me-2 text-warning"></i>Campus Security: Desk #12</li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="text-white fw-bold mb-3">Student Portal</h6>
+                    {% if current_user.is_authenticated %}
+                        <p class="small text-muted mb-2">Logged in as <strong>{{ current_user.name }}</strong></p>
+                        <a href="{{ url_for('auth.dashboard') }}" class="btn btn-outline-light btn-sm w-100 mb-2">
+                            <i class="bi bi-speedometer2 me-1"></i>Go to Dashboard
+                        </a>
+                    {% else %}
+                        <p class="small text-muted mb-2">Have you misplaced property or turned in an item?</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm w-100 mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Sign In to Account
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="border-top border-secondary border-opacity-25 mt-4 pt-3 text-center small text-muted">
+                &copy; {{ now_year or 2026 }} Campus Lost &amp; Found. Academic Capstone Project.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Custom Application JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

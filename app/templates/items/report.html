@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Report a {{ item_type|capitalize }} Item | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('items.lost_items' if item_type == 'lost' else 'items.found_items') }}" class="text-decoration-none">{{ item_type|capitalize }} Items</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Report {{ item_type|capitalize }} Item</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card campus-card shadow-sm border-0 mb-5">
+                <div class="card-header bg-white border-bottom p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="step-icon mb-0" style="background-color: {{ 'var(--campus-lost-light)' if item_type == 'lost' else 'var(--campus-found-light)' }}; color: {{ 'var(--campus-lost)' if item_type == 'lost' else 'var(--campus-found)' }};">
+                            <i class="bi {{ 'bi-question-circle-fill' if item_type == 'lost' else 'bi-check-circle-fill' }}" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <span class="badge {{ 'badge-lost' if item_type == 'lost' else 'badge-found' }} text-uppercase mb-1">
+                                {{ item_type }} Item Report
+                            </span>
+                            <h1 class="h3 fw-bold mb-0">Report a {{ item_type|capitalize }} Item</h1>
+                            <p class="text-muted small mb-0">
+                                {% if item_type == 'lost' %}
+                                Describe your misplaced belonging so the campus community can help locate it.
+                                {% else %}
+                                Submit details for an item you found on campus grounds or in university facilities.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{{ url_for('items.report_item', item_type=item_type) }}" enctype="multipart/form-data" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Item Title -->
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-semibold") }}
+                            <div class="input-group has-validation">
+                                <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                    <i class="bi bi-tag"></i>
+                                </span>
+                                {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else ""), placeholder="e.g. Silver Dell XPS 13 Laptop, Blue Hydroflask, Student ID Card", required=True) }}
+                                {% for error in form.title.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text text-muted small">Provide a clear, recognizable name for the item.</div>
+                        </div>
+
+                        <!-- Category & Color Row -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                {{ form.category.label(class="form-label fw-semibold") }}
+                                {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else "")) }}
+                                {% for error in form.category.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.color.label(class="form-label fw-semibold") }}
+                                {{ form.color(class="form-control" + (" is-invalid" if form.color.errors else ""), placeholder="e.g. Navy Blue, Matte Black, Red") }}
+                                {% for error in form.color.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Location & Date Row -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                {{ form.location.label(class="form-label fw-semibold") }}
+                                <div class="input-group has-validation">
+                                    <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </span>
+                                    {{ form.location(class="form-control" + (" is-invalid" if form.location.errors else ""), placeholder="e.g. Science Library 2nd Floor, Room 204", required=True) }}
+                                    {% for error in form.location.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.incident_date.label(class="form-label fw-semibold") }}
+                                <div class="input-group has-validation">
+                                    <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </span>
+                                    {{ form.incident_date(class="form-control" + (" is-invalid" if form.incident_date.errors else ""), type="date", required=True) }}
+                                    {% for error in form.incident_date.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label fw-semibold") }}
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="4", placeholder="Include distinctive marks, scratches, stickers, brand name, condition, or relevant accessories...", required=True) }}
+                            {% for error in form.description.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Photograph Upload -->
+                        <div class="mb-4">
+                            {{ form.image.label(class="form-label fw-semibold") }}
+                            {{ form.image(class="form-control" + (" is-invalid" if form.image.errors else ""), accept="image/png,image/jpeg,image/webp,image/gif") }}
+                            {% for error in form.image.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text text-muted small">
+                                Optional: Clear photographs significantly speed up identification and claim verification. Max file size: 5MB (JPG, PNG, WEBP, GIF).
+                            </div>
+                        </div>
+
+                        <!-- Notice Banner -->
+                        <div class="alert alert-light border border-secondary border-opacity-25 small text-muted mb-4 d-flex align-items-center">
+                            <i class="bi bi-shield-check text-primary me-2 fs-5" aria-hidden="true"></i>
+                            <div>
+                                This listing will be published under your verified student account (<strong>{{ current_user.name }}</strong>). Your email address remains private.
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center pt-2">
+                            <a href="{{ url_for('items.lost_items' if item_type == 'lost' else 'items.found_items') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                                <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Submit {{ item_type|capitalize }} Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

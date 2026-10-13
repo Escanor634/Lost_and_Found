@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Register | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card auth-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="step-icon mb-2">
+                            <i class="bi bi-person-plus" aria-hidden="true"></i>
+                        </div>
+                        <h1 class="h3 fw-bold mb-1">Create Account</h1>
+                        <p class="text-muted small">Join your campus community to report and claim belongings</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Full Name Field -->
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label fw-semibold") }}
+                            <div class="input-group has-validation">
+                                <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), placeholder="Jane Doe", autocomplete="name", required=True) }}
+                                {% for error in form.name.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Campus Email Field -->
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label fw-semibold") }}
+                            <div class="input-group has-validation">
+                                <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="janedoe@campus.edu", autocomplete="email", required=True) }}
+                                {% for error in form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text text-muted small">
+                                Use your official campus email address (@campus.edu).
+                            </div>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label fw-semibold") }}
+                            <div class="input-group has-validation">
+                                <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Minimum 8 characters", autocomplete="new-password", required=True) }}
+                                {% for error in form.password.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text text-muted small">
+                                Must be at least 8 characters in length.
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password Field -->
+                        <div class="mb-4">
+                            {{ form.password_confirm.label(class="form-label fw-semibold") }}
+                            <div class="input-group has-validation">
+                                <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                    <i class="bi bi-shield-lock"></i>
+                                </span>
+                                {{ form.password_confirm(class="form-control" + (" is-invalid" if form.password_confirm.errors else ""), placeholder="Re-enter your password", autocomplete="new-password", required=True) }}
+                                {% for error in form.password_confirm.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Role Notice Banner -->
+                        <div class="alert alert-light border border-secondary border-opacity-25 small text-muted mb-4 d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill text-primary me-2 fs-5" aria-hidden="true"></i>
+                            <div>
+                                All campus registrations are granted verified <strong>Student</strong> membership by default.
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg fw-semibold shadow-sm">
+                                <i class="bi bi-person-check me-1" aria-hidden="true"></i> Create Account
+                            </button>
+                        </div>
+
+                        <div class="text-center text-muted small pt-3 border-top">
+                            Already registered? 
+                            <a href="{{ url_for('auth.login') }}" class="text-primary fw-bold text-decoration-none">
+                                Sign in here
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

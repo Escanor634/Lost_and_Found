@@ -1,0 +1,287 @@
+/* ==========================================================================
+   Campus Lost & Found - Design System & Custom Styles
+   ========================================================================== */
+
+:root {
+    --campus-primary: #0f4c81;
+    --campus-primary-hover: #0a3760;
+    --campus-primary-light: #e8f1fa;
+    --campus-secondary: #475569;
+    --campus-lost: #dc2626;
+    --campus-lost-light: #fee2e2;
+    --campus-found: #16a34a;
+    --campus-found-light: #dcfce7;
+    --campus-warning: #d97706;
+    --campus-warning-light: #fef3c7;
+    --campus-dark: #0f172a;
+    --campus-muted: #64748b;
+    --campus-bg: #f8fafc;
+    --campus-card-bg: #ffffff;
+    --campus-border: #e2e8f0;
+    --campus-radius: 0.75rem;
+    --campus-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --campus-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --campus-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+}
+
+/* Accessibility: Skip Link */
+.skip-link {
+    position: absolute;
+    top: -50px;
+    left: 1rem;
+    background-color: var(--campus-primary);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    z-index: 1050;
+    border-radius: 0 0 0.5rem 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid #ffcc00;
+}
+
+/* General Layout */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--campus-bg);
+    color: var(--campus-dark);
+    line-height: 1.6;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* Keyboard Focus Rings */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--campus-primary);
+    outline-offset: 2px;
+}
+
+/* Navigation Bar */
+.navbar {
+    background-color: var(--campus-primary) !important;
+    padding: 0.85rem 0;
+    transition: all 0.2s ease;
+}
+
+.navbar-brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    padding: 0.5rem 0.85rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.navbar-nav .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #0f4c81 0%, #1e3a8a 50%, #0d3b66 100%);
+    color: #ffffff;
+    padding: 4.5rem 1rem 3.5rem;
+    border-radius: 0 0 2rem 2rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    box-shadow: 0 10px 25px -5px rgba(15, 76, 129, 0.25);
+}
+
+.hero-title {
+    font-size: 2.75rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.92;
+    max-width: 720px;
+    margin: 1.2rem auto 2rem;
+}
+
+/* Search Preview Bar */
+.search-preview-box {
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: var(--campus-shadow-lg);
+    border: 1px solid var(--campus-border);
+    padding: 0.5rem;
+}
+
+.search-preview-input {
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    background: transparent;
+}
+
+.search-preview-input:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background-color: #ffffff;
+    border: 1px solid var(--campus-border);
+    color: var(--campus-secondary);
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.category-chip:hover {
+    border-color: var(--campus-primary);
+    color: var(--campus-primary);
+    background-color: var(--campus-primary-light);
+}
+
+/* Cards & Placeholders */
+.campus-card {
+    background-color: var(--campus-card-bg);
+    border: 1px solid var(--campus-border);
+    border-radius: var(--campus-radius);
+    box-shadow: var(--campus-shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campus-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--campus-shadow);
+}
+
+.placeholder-card {
+    border: 2px dashed #cbd5e1;
+    background-color: #ffffff;
+    border-radius: var(--campus-radius);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.placeholder-card:hover {
+    transform: translateY(-2px);
+    border-color: #94a3b8;
+    box-shadow: var(--campus-shadow);
+}
+
+/* Status Badges */
+.badge-lost {
+    background-color: var(--campus-lost-light);
+    color: var(--campus-lost);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    font-weight: 600;
+}
+
+.badge-found {
+    background-color: var(--campus-found-light);
+    color: var(--campus-found);
+    border: 1px solid rgba(22, 163, 74, 0.2);
+    font-weight: 600;
+}
+
+.badge-pending {
+    background-color: var(--campus-warning-light);
+    color: var(--campus-warning);
+    border: 1px solid rgba(217, 119, 6, 0.2);
+    font-weight: 600;
+}
+
+/* Step Icons */
+.step-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background-color: var(--campus-primary-light);
+    color: var(--campus-primary);
+    margin-bottom: 1rem;
+}
+
+/* Flash Messages */
+.alert {
+    border-radius: var(--campus-radius);
+    border: none;
+    font-weight: 500;
+}
+
+/* Auth Cards */
+.auth-card {
+    border-radius: 1rem;
+    border: 1px solid var(--campus-border);
+    box-shadow: var(--campus-shadow-lg);
+    background-color: #ffffff;
+}
+
+.auth-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--campus-border);
+    padding: 2rem 2rem 1rem;
+}
+
+/* Footer */
+footer {
+    background-color: #0b1329;
+    color: #94a3b8;
+    padding: 3.5rem 0 2rem;
+    margin-top: 5rem;
+    border-top: 3px solid var(--campus-primary);
+}
+
+footer a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+footer a:hover,
+footer a:focus {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    .hero-subtitle {
+        font-size: 1.05rem;
+    }
+    .hero-section {
+        padding: 3rem 1rem 2.5rem;
+    }
+}

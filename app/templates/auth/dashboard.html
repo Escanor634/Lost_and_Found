@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Student Dashboard</li>
+        </ol>
+    </nav>
+
+    <!-- Welcome Banner Header -->
+    <div class="card border-0 text-white rounded-3 p-4 p-md-5 mb-4 shadow-sm" style="background: linear-gradient(135deg, #0f4c81 0%, #1e3a8a 100%);">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-light text-primary px-3 py-1 mb-2 fw-semibold shadow-sm">
+                    <i class="bi bi-mortarboard-fill me-1" aria-hidden="true"></i> Student Portal
+                </span>
+                <h1 class="fw-bold mb-2">Welcome, {{ user.name }}!</h1>
+                <p class="lead mb-0 opacity-90 fs-6">
+                    Manage your campus lost item inquiries, track recovery progress, and review pending claims in one centralized workspace.
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex flex-wrap gap-2 justify-content-md-end">
+                <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-person-lines-fill me-1" aria-hidden="true"></i> My Profile
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-light btn-sm text-primary fw-semibold">
+                    <i class="bi bi-search me-1" aria-hidden="true"></i> Search Catalog
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Honest Status Overview Widgets -->
+    <div class="row g-4 mb-4">
+        <!-- Account Status Card -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card campus-card h-100 p-3">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="step-icon text-primary me-3 mb-0" style="width: 2.75rem; height: 2.75rem; font-size: 1.15rem;">
+                        <i class="bi bi-person-check" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block fw-semibold">Account Standing</small>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 text-uppercase">
+                            {{ user.status }}
+                        </span>
+                    </div>
+                </div>
+                <small class="text-muted">Role: <strong>{{ user.role|capitalize }}</strong></small>
+            </div>
+        </div>
+
+        <!-- My Reported Lost Items Card -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card campus-card h-100 p-3">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="step-icon text-danger me-3 mb-0" style="width: 2.75rem; height: 2.75rem; font-size: 1.15rem; background-color: var(--campus-lost-light); color: var(--campus-lost);">
+                        <i class="bi bi-tag-fill" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block fw-semibold">Lost Reports</small>
+                        <h5 class="fw-bold mb-0">0 Listed</h5>
+                    </div>
+                </div>
+                <small class="text-muted">Module staged for Stage 5</small>
+            </div>
+        </div>
+
+        <!-- My Reported Found Items Card -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card campus-card h-100 p-3">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="step-icon text-success me-3 mb-0" style="width: 2.75rem; height: 2.75rem; font-size: 1.15rem; background-color: var(--campus-found-light); color: var(--campus-found);">
+                        <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block fw-semibold">Found Items</small>
+                        <h5 class="fw-bold mb-0">0 Reported</h5>
+                    </div>
+                </div>
+                <small class="text-muted">Module staged for Stage 5</small>
+            </div>
+        </div>
+
+        <!-- My Active Claims Card -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card campus-card h-100 p-3">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="step-icon text-warning me-3 mb-0" style="width: 2.75rem; height: 2.75rem; font-size: 1.15rem; background-color: var(--campus-warning-light); color: var(--campus-warning);">
+                        <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block fw-semibold">Claims Filed</small>
+                        <h5 class="fw-bold mb-0">0 Active</h5>
+                    </div>
+                </div>
+                <small class="text-muted">Claims workflow staged for Stage 5</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Sections (Clearly Marked Placeholders) -->
+    <div class="row g-4">
+        <!-- Lost & Found Inquiries Placeholder -->
+        <div class="col-lg-8">
+            <div class="card campus-card mb-4">
+                <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                    <h2 class="h5 fw-bold mb-0">My Item Reports</h2>
+                    <a href="{{ url_for('items.my_items') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-collection me-1" aria-hidden="true"></i> View All
+                    </a>
+                </div>
+                <div class="card-body p-4 text-center py-5">
+                    <div class="step-icon text-muted mb-3 mx-auto" style="background-color: var(--campus-bg);">
+                        <i class="bi bi-inbox fs-2" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="h6 fw-bold text-dark">Track &amp; Manage Your Reports</h3>
+                    <p class="text-muted small mx-auto mb-3" style="max-width: 440px;">
+                        When you submit a lost or found report on campus, you can monitor verification status, edit details, and manage listings directly from your reports dashboard.
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ url_for('items.my_items') }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-collection me-1" aria-hidden="true"></i> View My Reports
+                        </a>
+                        <a href="{{ url_for('items.report_choice') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Report New Item
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Claims Placeholder -->
+            <div class="card campus-card">
+                <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                    <h2 class="h5 fw-bold mb-0">My Active Ownership Claims</h2>
+                    <span class="badge bg-secondary">Awaiting Stage 5 Activation</span>
+                </div>
+                <div class="card-body p-4 text-center py-5">
+                    <div class="step-icon text-muted mb-3 mx-auto" style="background-color: var(--campus-bg);">
+                        <i class="bi bi-shield-lock fs-2" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="h6 fw-bold text-dark">No Active Claims Submitted</h3>
+                    <p class="text-muted small mx-auto mb-0" style="max-width: 440px;">
+                        Once you submit proof of ownership for a cataloged item, campus review status (pending, approved, or rejected) will appear here.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar / Alerts Placeholder -->
+        <div class="col-lg-4">
+            <div class="card campus-card mb-4">
+                <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                    <h2 class="h5 fw-bold mb-0">Recent Alerts &amp; Notifications</h2>
+                    <span class="badge bg-secondary">Stage 7</span>
+                </div>
+                <div class="card-body p-4 text-center py-4 text-muted">
+                    <i class="bi bi-bell-slash fs-1 d-block mb-2 text-secondary opacity-50" aria-hidden="true"></i>
+                    <h3 class="h6 fw-semibold text-dark">All Caught Up</h3>
+                    <p class="small mb-0">You have no unread notifications or claim update alerts.</p>
+                </div>
+            </div>
+
+            <div class="card campus-card p-3">
+                <h3 class="h6 fw-bold mb-2">Need Campus Assistance?</h3>
+                <p class="small text-muted mb-3">
+                    Visit the campus security desk in the Student Center to deposit physical items or speak with staff.
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-person me-1" aria-hidden="true"></i> View My Profile
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Log Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

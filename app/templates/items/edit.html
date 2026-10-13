@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Listing: {{ item.title }} | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('items.my_items') }}" class="text-decoration-none">My Reports</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="text-decoration-none">{{ item.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card campus-card shadow-sm border-0 mb-5">
+                <div class="card-header bg-white border-bottom p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="step-icon mb-0" style="background-color: var(--campus-primary-light); color: var(--campus-primary);">
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <span class="badge {{ 'badge-lost' if item.item_type == 'lost' else 'badge-found' }} text-uppercase mb-1">
+                                {{ item.item_type }} Item
+                            </span>
+                            <h1 class="h3 fw-bold mb-0">Edit Item Listing</h1>
+                            <p class="text-muted small mb-0">Update listing details, status, or photograph for '{{ item.title }}'.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{{ url_for('items.edit_item', item_id=item.id) }}" enctype="multipart/form-data" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Listing Status -->
+                        <div class="mb-4 p-3 bg-light rounded border">
+                            {{ form.status.label(class="form-label fw-bold") }}
+                            <div class="input-group has-validation">
+                                <span class="input-group-text bg-white text-muted" aria-hidden="true">
+                                    <i class="bi bi-flag"></i>
+                                </span>
+                                {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else ""), required=True) }}
+                                {% for error in form.status.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text text-muted small">Update this to 'Recovered' once the item has been returned, or 'Closed' if cancelled.</div>
+                        </div>
+
+                        <!-- Item Title -->
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-semibold") }}
+                            <div class="input-group has-validation">
+                                <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                    <i class="bi bi-tag"></i>
+                                </span>
+                                {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else ""), required=True) }}
+                                {% for error in form.title.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Category & Color Row -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                {{ form.category.label(class="form-label fw-semibold") }}
+                                <div class="input-group has-validation">
+                                    <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                        <i class="bi bi-grid"></i>
+                                    </span>
+                                    {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else ""), required=True) }}
+                                    {% for error in form.category.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.color.label(class="form-label fw-semibold") }}
+                                <div class="input-group has-validation">
+                                    <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                        <i class="bi bi-palette"></i>
+                                    </span>
+                                    {{ form.color(class="form-control" + (" is-invalid" if form.color.errors else "")) }}
+                                    {% for error in form.color.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location & Incident Date Row -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                {{ form.location.label(class="form-label fw-semibold") }}
+                                <div class="input-group has-validation">
+                                    <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </span>
+                                    {{ form.location(class="form-control" + (" is-invalid" if form.location.errors else ""), required=True) }}
+                                    {% for error in form.location.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.incident_date.label(class="form-label fw-semibold") }}
+                                <div class="input-group has-validation">
+                                    <span class="input-group-text bg-light text-muted" aria-hidden="true">
+                                        <i class="bi bi-calendar"></i>
+                                    </span>
+                                    {{ form.incident_date(class="form-control" + (" is-invalid" if form.incident_date.errors else ""), required=True) }}
+                                    {% for error in form.incident_date.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            {{ form.description.label(class="form-label fw-semibold") }}
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="5", required=True) }}
+                            {% for error in form.description.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Photograph Management -->
+                        <div class="mb-4 p-3 bg-light rounded border">
+                            <h2 class="h6 fw-bold mb-3">
+                                <i class="bi bi-image me-1" aria-hidden="true"></i> Photograph Management
+                            </h2>
+
+                            {% if item.image_path %}
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <img src="{{ url_for('static', filename='uploads/' + item.image_path) }}" 
+                                     alt="Current photo of {{ item.title }}" 
+                                     class="rounded border" 
+                                     style="width: 80px; height: 80px; object-fit: cover;">
+                                <div>
+                                    <div class="small fw-semibold">Current Photograph</div>
+                                    <div class="form-check mt-1">
+                                        {{ form.remove_image(class="form-check-input", id="remove_image") }}
+                                        {{ form.remove_image.label(class="form-check-label small text-danger fw-semibold", for="remove_image") }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-1">
+                                <label for="image" class="form-label small fw-semibold">
+                                    {{ 'Replace photograph' if item.image_path else 'Add photograph' }} (Optional)
+                                </label>
+                                {{ form.image(class="form-control form-control-sm" + (" is-invalid" if form.image.errors else ""), id="image", accept="image/png,image/jpeg,image/webp,image/gif") }}
+                                {% for error in form.image.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                                <div class="form-text text-muted small">Max 5MB (PNG, JPG, WEBP, GIF).</div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                            <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-lg me-1" aria-hidden="true"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

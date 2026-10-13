@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: campus-lost-and-found
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt && flask db upgrade
+    startCommand: gunicorn run:app
+    healthCheckPath: /health
+    envVars:
+      - key: FLASK_CONFIG
+        value: production
+      - key: FLASK_DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateString: true
+      - key: PYTHON_VERSION
+        value: 3.12.3

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.title }} | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('items.lost_items' if item.item_type == 'lost' else 'items.found_items') }}" class="text-decoration-none">
+                    {{ item.item_type|capitalize }} Items
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-truncate max-w-300" aria-current="page">{{ item.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Main Item Details (Left / Main Column) -->
+        <div class="col-lg-8">
+            <div class="card campus-card shadow-sm border-0 mb-4">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                        <span class="badge {{ 'badge-lost' if item.item_type == 'lost' else 'badge-found' }} text-uppercase">
+                            {{ item.item_type }} Item
+                        </span>
+                        <span class="badge bg-light text-dark border">
+                            <i class="bi bi-tag me-1" aria-hidden="true"></i>{{ item.category|capitalize }}
+                        </span>
+                        {% if item.color %}
+                        <span class="badge bg-light text-muted border">
+                            <i class="bi bi-palette me-1" aria-hidden="true"></i>{{ item.color }}
+                        </span>
+                        {% endif %}
+                        
+                        <!-- Status indicator -->
+                        {% if item.status == 'open' %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle ms-auto">Status: Open</span>
+                        {% elif item.status == 'claim_pending' %}
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle ms-auto">Status: Claim Pending</span>
+                        {% elif item.status == 'recovered' %}
+                        <span class="badge bg-info-subtle text-info border border-info-subtle ms-auto">Status: Recovered</span>
+                        {% elif item.status == 'closed' %}
+                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle ms-auto">Status: Closed</span>
+                        {% endif %}
+                    </div>
+
+                    <h1 class="h2 fw-bold mb-3">{{ item.title }}</h1>
+
+                    <!-- Image Display (if exists) -->
+                    {% if item.image_path %}
+                    <div class="mb-4 text-center rounded overflow-hidden bg-light border p-2">
+                        <img src="{{ url_for('static', filename='uploads/' + item.image_path) }}" 
+                             alt="{{ item.title }}" 
+                             class="img-fluid rounded shadow-sm" 
+                             style="max-height: 420px; width: auto; object-fit: contain;">
+                    </div>
+                    {% endif %}
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h2 class="h5 fw-bold mb-2">Detailed Description</h2>
+                        <div class="p-3 bg-light rounded text-secondary" style="white-space: pre-wrap; line-height: 1.6;">{{ item.description }}</div>
+                    </div>
+
+                    <!-- Key Metadata Attributes -->
+                    <div class="row g-3 pt-3 border-top">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="step-icon mb-0 flex-shrink-0" style="width: 40px; height: 40px; font-size: 1.1rem; background-color: var(--campus-light-gray); color: var(--campus-danger);">
+                                    <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Campus Location</div>
+                                    <div class="fw-semibold">{{ item.location }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="step-icon mb-0 flex-shrink-0" style="width: 40px; height: 40px; font-size: 1.1rem; background-color: var(--campus-light-gray); color: var(--campus-primary);">
+                                    <i class="bi bi-calendar-event-fill" aria-hidden="true"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Date {{ 'Misplaced' if item.item_type == 'lost' else 'Discovered' }}</div>
+                                    <div class="fw-semibold">{{ item.incident_date.strftime('%B %d, %Y') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Column (Reporter & Actions) -->
+        <div class="col-lg-4">
+            <!-- Reporter Card (Public info only, strictly no emails) -->
+            <div class="card campus-card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom p-3">
+                    <h3 class="h6 fw-bold mb-0">Reported By</h3>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="step-icon mb-0 flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.3rem; background-color: var(--campus-primary-light); color: var(--campus-primary);">
+                            <i class="bi bi-person-fill" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">{{ item.user.name }}</div>
+                            <div class="text-muted small">
+                                <i class="bi bi-mortarboard me-1" aria-hidden="true"></i>Campus Member
+                            </div>
+                        </div>
+                    </div>
+                    <div class="small text-muted border-top pt-2">
+                        <div><i class="bi bi-clock-history me-1" aria-hidden="true"></i>Reported on {{ item.created_at.strftime('%b %d, %Y at %I:%M %p') }}</div>
+                        {% if item.updated_at and item.updated_at != item.created_at %}
+                        <div class="mt-1"><i class="bi bi-pencil-square me-1" aria-hidden="true"></i>Updated on {{ item.updated_at.strftime('%b %d, %Y') }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Actions for Item Owner or Admin -->
+            {% if current_user.is_authenticated and (current_user.id == item.user_id or current_user.is_admin()) %}
+            <div class="card campus-card shadow-sm border-0 mb-4 border-primary">
+                <div class="card-header bg-primary-subtle text-primary border-bottom p-3">
+                    <h3 class="h6 fw-bold mb-0">
+                        <i class="bi bi-shield-lock me-1" aria-hidden="true"></i> Manage Your Listing
+                    </h3>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted small mb-3">
+                        As the creator of this report, you can update its status, change description, or update its photograph.
+                    </p>
+                    <a href="{{ url_for('items.edit_item', item_id=item.id) }}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-pencil me-1" aria-hidden="true"></i> Edit Listing
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Navigation Helper -->
+            <div class="card campus-card shadow-sm border-0 p-3">
+                <a href="{{ url_for('items.lost_items' if item.item_type == 'lost' else 'items.found_items') }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                    <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Back to {{ item.item_type|capitalize }} Catalog
+                </a>
+                <a href="{{ url_for('items.report_choice') }}" class="btn btn-light btn-sm w-100 border text-muted">
+                    <i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Report Another Item
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('auth.dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Account Profile</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card campus-card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom p-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div>
+                            <span class="badge bg-light text-primary px-3 py-1 mb-1 fw-semibold border">
+                                <i class="bi bi-shield-check me-1" aria-hidden="true"></i> Verified Campus Member
+                            </span>
+                            <h1 class="h3 fw-bold mb-0">Account Profile</h1>
+                            <p class="text-muted small mb-0">Your verified campus user credentials and account status</p>
+                        </div>
+                        <span class="badge bg-primary px-3 py-2 text-uppercase fs-7">{{ user.role }}</span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-sm-6">
+                            <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Full Name</span>
+                            <p class="fs-5 fw-bold text-dark mb-0">{{ user.name }}</p>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Campus Email</span>
+                            <p class="fs-5 fw-bold text-dark mb-0">{{ user.email }}</p>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Account Role</span>
+                            <div>
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 text-uppercase">
+                                    <i class="bi bi-person-badge me-1" aria-hidden="true"></i> {{ user.role }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Account Status</span>
+                            <div>
+                                {% if user.status == 'active' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                                        <i class="bi bi-check-circle me-1" aria-hidden="true"></i> Active ({{ user.status }})
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                        <i class="bi bi-slash-circle me-1" aria-hidden="true"></i> Suspended ({{ user.status }})
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Member Since</span>
+                            <p class="fs-6 text-dark mb-0">
+                                <i class="bi bi-calendar-event me-1 text-primary" aria-hidden="true"></i>
+                                {{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}
+                            </p>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Profile Security</span>
+                            <p class="small text-muted mb-0">
+                                <i class="bi bi-lock-fill text-success me-1" aria-hidden="true"></i>
+                                Password securely encrypted with salted cryptographic hash.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light p-3 border-top d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('auth.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Back to Dashboard
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Log Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

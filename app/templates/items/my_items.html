@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}My Reports | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('auth.dashboard') }}" class="text-decoration-none">Student Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Reports</li>
+        </ol>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pb-3 mb-4 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle text-uppercase">
+                    Report Management
+                </span>
+                <span class="text-muted small">({{ pagination.total }} {{ 'report' if pagination.total == 1 else 'reports' }})</span>
+            </div>
+            <h1 class="h2 fw-bold mb-1">My Reported Items</h1>
+            <p class="text-muted small mb-0">
+                Track, update, or resolve items you have posted on the campus platform.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('items.report_choice') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Report New Item
+            </a>
+        </div>
+    </div>
+
+    <!-- Items Listing -->
+    {% if pagination.items %}
+    <div class="card campus-card shadow-sm border-0 mb-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted small text-uppercase">
+                    <tr>
+                        <th scope="col" style="min-width: 220px;">Item</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pagination.items %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if item.image_path %}
+                                <img src="{{ url_for('static', filename='uploads/' + item.image_path) }}" 
+                                     alt="{{ item.title }}" 
+                                     class="rounded border flex-shrink-0" 
+                                     style="width: 48px; height: 48px; object-fit: cover;">
+                                {% else %}
+                                <div class="rounded border bg-light d-flex align-items-center justify-content-center text-muted flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-image" aria-hidden="true"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="fw-semibold text-dark text-decoration-none">
+                                        {{ item.title }}
+                                    </a>
+                                    <div class="text-muted small text-truncate max-w-200">
+                                        <i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ item.location }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge {{ 'badge-lost' if item.item_type == 'lost' else 'badge-found' }} text-uppercase">
+                                {{ item.item_type }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="small text-muted">{{ item.category }}</span>
+                        </td>
+                        <td>
+                            <span class="small text-muted">{{ item.incident_date.strftime('%b %d, %Y') }}</span>
+                        </td>
+                        <td>
+                            {% if item.status == 'open' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Open</span>
+                            {% elif item.status == 'claim_pending' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Claim Pending</span>
+                            {% elif item.status == 'recovered' %}
+                            <span class="badge bg-info-subtle text-info border border-info-subtle">Recovered</span>
+                            {% elif item.status == 'closed' %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Closed</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-outline-secondary" title="View Details">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </a>
+                                <a href="{{ url_for('items.edit_item', item_id=item.id) }}" class="btn btn-outline-primary" title="Edit Listing">
+                                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{ 'disabled' if not pagination.has_prev else '' }}">
+                <a class="page-link" href="{{ url_for('items.my_items', page=pagination.prev_num) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo; Previous</span>
+                </a>
+            </li>
+            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if p %}
+                    <li class="page-item {{ 'active' if p == pagination.page else '' }}">
+                        <a class="page-link" href="{{ url_for('items.my_items', page=p) }}">{{ p }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                {% endif %}
+            {% endfor %}
+            <li class="page-item {{ 'disabled' if not pagination.has_next else '' }}">
+                <a class="page-link" href="{{ url_for('items.my_items', page=pagination.next_num) }}" aria-label="Next">
+                    <span aria-hidden="true">Next &raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Honest Empty State -->
+    <div class="card campus-card shadow-sm border-0 text-center py-5 my-4">
+        <div class="card-body py-5">
+            <div class="step-icon mx-auto mb-3" style="background-color: var(--campus-light-gray); color: var(--campus-gray); width: 64px; height: 64px; font-size: 1.8rem;">
+                <i class="bi bi-folder2-open" aria-hidden="true"></i>
+            </div>
+            <h2 class="h4 fw-bold mb-2">You Haven't Submitted Any Reports Yet</h2>
+            <p class="text-muted small max-w-500 mx-auto mb-4">
+                When you report a lost belonging or an item you recovered on campus, it will appear here so you can easily track its status and edit details.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('items.report_lost') }}" class="btn btn-lost">
+                    <i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Report Lost Item
+                </a>
+                <a href="{{ url_for('items.report_found') }}" class="btn btn-found">
+                    <i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Report Found Item
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
