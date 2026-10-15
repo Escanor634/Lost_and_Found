@@ -62,3 +62,6 @@ htmlcov/
 app/static/uploads/*
 !app/static/uploads/.gitkeep
 tests/test_uploads/
+
+
+PROJECT_STATUS.md
