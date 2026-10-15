@@ -93,10 +93,186 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Pending / Ownership Claims Section for Item Owner or Admin -->
+            {% if current_user.is_authenticated and (current_user.id == item.user_id or current_user.is_admin()) and item.item_type == 'found' %}
+            <div class="card campus-card shadow-sm border-0 mb-4" id="claims-section">
+                <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle text-uppercase mb-1">Owner Review</span>
+                        <h2 class="h5 fw-bold mb-0">Pending Claims &amp; Verification</h2>
+                        <p class="text-muted small mb-0">Review ownership verification details submitted by students.</p>
+                    </div>
+                    <span class="badge bg-light text-dark border px-3 py-2">
+                        {{ item.claims|length }} {{ 'Claim' if item.claims|length == 1 else 'Claims' }}
+                    </span>
+                </div>
+                <div class="card-body p-4">
+                    {% if item.claims %}
+                        <div class="vstack gap-3">
+                            {% for claim in item.claims %}
+                            <div class="border rounded-3 p-3 bg-light-subtle shadow-xs">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 pb-2 border-bottom">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="step-icon mb-0 flex-shrink-0" style="width: 36px; height: 36px; font-size: 1rem; background-color: var(--campus-primary-light); color: var(--campus-primary);">
+                                            <i class="bi bi-person-fill" aria-hidden="true"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ claim.claimant.name }}</div>
+                                            <div class="text-muted small">
+                                                <i class="bi bi-clock me-1"></i>Submitted on {{ claim.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {% if claim.status == 'pending' %}
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">
+                                            <i class="bi bi-hourglass-split me-1"></i>Pending
+                                        </span>
+                                        {% elif claim.status == 'approved' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            <i class="bi bi-check-circle me-1"></i>Approved
+                                        </span>
+                                        {% elif claim.status == 'rejected' %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                            <i class="bi bi-x-circle me-1"></i>Rejected
+                                        </span>
+                                        {% elif claim.status == 'withdrawn' %}
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">
+                                            <i class="bi bi-slash-circle me-1"></i>Withdrawn
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-semibold mb-1">
+                                        <i class="bi bi-shield-check me-1"></i>Proof of Ownership / Verification Details:
+                                    </label>
+                                    <div class="p-3 bg-white rounded border small text-secondary" style="white-space: pre-wrap; line-height: 1.6;">{{ claim.proof_description }}</div>
+                                </div>
+
+                                {% if claim.reviewed_at %}
+                                <div class="text-muted small mb-2">
+                                    <i class="bi bi-check2-all me-1"></i>Reviewed on {{ claim.reviewed_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                    {% if claim.reviewer %}
+                                    by <strong>{{ claim.reviewer.name }}</strong>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                {% if claim.status == 'pending' and item.status == 'open' and current_user.id == item.user_id %}
+                                <div class="d-flex flex-wrap gap-2 pt-2 border-top">
+                                    <form method="POST" action="{{ url_for('claims.approve_claim', claim_id=claim.id) }}" class="d-inline">
+                                        {{ action_form.hidden_tag() if action_form else '' }}
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-success fw-semibold" onclick="return confirm('Approve this claim? The item status will be set to recovered.');">
+                                            <i class="bi bi-check-lg me-1" aria-hidden="true"></i> Approve Claim
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('claims.reject_claim', claim_id=claim.id) }}" class="d-inline">
+                                        {{ action_form.hidden_tag() if action_form else '' }}
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Reject this claim?');">
+                                            <i class="bi bi-x-lg me-1" aria-hidden="true"></i> Reject Claim
+                                        </button>
+                                    </form>
+                                </div>
+                                {% elif claim.status == 'pending' and item.status != 'open' %}
+                                <div class="text-muted small fst-italic pt-1 border-top">
+                                    <i class="bi bi-info-circle me-1"></i>Cannot review: item is already marked as {{ item.status }}.
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <!-- Friendly Empty State for Owner -->
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50" aria-hidden="true"></i>
+                            <h3 class="h6 fw-semibold text-dark">No Pending Claims Yet</h3>
+                            <p class="small mb-0">When students file ownership verification for this found item, their submissions will appear here for your review.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Sidebar Column (Reporter & Actions) -->
         <div class="col-lg-4">
+            <!-- Claim Action Card for Found Items -->
+            {% if item.item_type == 'found' %}
+                {% if current_user.is_authenticated and current_user.id != item.user_id %}
+                    {% if user_claim %}
+                    <div class="card campus-card shadow-sm border-0 mb-4 border-info">
+                        <div class="card-header bg-info-subtle text-info border-bottom p-3">
+                            <h3 class="h6 fw-bold mb-0">
+                                <i class="bi bi-shield-check me-1" aria-hidden="true"></i> Your Claim Status
+                            </h3>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="small text-muted">Status:</span>
+                                {% if user_claim.status == 'pending' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Pending Review</span>
+                                {% elif user_claim.status == 'approved' %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">Approved</span>
+                                {% elif user_claim.status == 'rejected' %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rejected</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-muted small mb-3">
+                                You submitted a claim for this item on {{ user_claim.created_at.strftime('%b %d, %Y') }}.
+                            </p>
+                            <a href="{{ url_for('claims.my_claims') }}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-collection me-1" aria-hidden="true"></i> View in My Claims
+                            </a>
+                        </div>
+                    </div>
+                    {% elif item.status == 'open' %}
+                    <div class="card campus-card shadow-sm border-0 mb-4 border-success">
+                        <div class="card-header bg-success-subtle text-success border-bottom p-3">
+                            <h3 class="h6 fw-bold mb-0">
+                                <i class="bi bi-shield-check me-1" aria-hidden="true"></i> Is This Your Item?
+                            </h3>
+                        </div>
+                        <div class="card-body p-3">
+                            <p class="text-muted small mb-3">
+                                If you lost this item on campus, submit your proof of ownership so the finder can verify and return it to you.
+                            </p>
+                            <a href="{{ url_for('claims.submit_claim', item_id=item.id) }}" class="btn btn-success w-100 fw-semibold">
+                                <i class="bi bi-shield-lock-fill me-1" aria-hidden="true"></i> Claim This Item
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="card campus-card shadow-sm border-0 mb-4 bg-light">
+                        <div class="card-body p-3 text-center">
+                            <span class="badge bg-secondary mb-2">Claiming Closed</span>
+                            <p class="text-muted small mb-0">This item is marked as {{ item.status }} and is no longer accepting claims.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% elif not current_user.is_authenticated and item.status == 'open' %}
+                <div class="card campus-card shadow-sm border-0 mb-4 border-success">
+                    <div class="card-header bg-success-subtle text-success border-bottom p-3">
+                        <h3 class="h6 fw-bold mb-0">
+                            <i class="bi bi-shield-check me-1" aria-hidden="true"></i> Is This Your Item?
+                        </h3>
+                    </div>
+                    <div class="card-body p-3">
+                        <p class="text-muted small mb-3">
+                            Log in with your campus student account to submit proof of ownership and claim this item.
+                        </p>
+                        <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-outline-success w-100 fw-semibold">
+                            <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Log In to Claim
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+
             <!-- Reporter Card (Public info only, strictly no emails) -->
             <div class="card campus-card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white border-bottom p-3">

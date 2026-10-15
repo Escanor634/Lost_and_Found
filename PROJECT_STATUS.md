@@ -10,7 +10,7 @@
 | **Stage 4** | **Frontend UI and Dashboard** | **Completed** | Yes |
 | **Stage 5** | **Lost & Found Item Management** | **Completed** | Yes |
 | Stage 6 | Search, Filter & Matching | Pending | - |
-| Stage 7 | Claims & Verification Workflow | Pending | - |
+| **Stage 7** | **Claims & Verification Workflow** | **Completed** | Yes |
 | Stage 8 | Notifications & Activity Alerts | Pending | - |
 | Stage 9 | Admin Panel & Moderation | Pending | - |
 | Stage 10 | Polish, Security & Deployment Prep | Pending | - |
@@ -147,4 +147,30 @@
   - Created 23 comprehensive tests in `tests/test_items.py` covering auth protection, reporting workflows, validations, Pillow image verification, browse catalog, pagination, detail privacy, user report management, and 403 authorization.
   - Updated `tests/test_ui.py` to verify active report links.
   - Full test suite: **94 tests passing with 0 failures and 0 warnings**.
+
+---
+
+## Stage 7 Verification Summary
+
+- [x] **Item Claiming Workflow (`app/claims/routes.py`, `app/claims/forms.py`)**:
+  - `GET, POST /claims/item/<item_id>`: Authenticated students can submit ownership proof for found items with status `open`.
+  - Prominent "Claim This Item" button displayed on found-item detail page for non-owner authenticated students.
+  - Prevents non-authenticated users, owners claiming their own reports, claiming lost/closed/recovered items, and duplicate active claims (`pending` or `approved`).
+  - WTForms server-side validation on proof description length (10-2000 characters).
+  - CSRF protection enabled on all POST requests.
+- [x] **Claim Review and Ownership Authorization (`app/claims/routes.py`)**:
+  - Owner-exclusive "Pending Claims & Verification" section integrated into item details page (`/items/<item_id>`).
+  - Strict authorization: non-owners receive HTTP 403 Forbidden; claimants are blocked from reviewing their own claim (HTTP 403).
+  - Review actions `POST /claims/<claim_id>/approve` and `POST /claims/<claim_id>/reject` protected with CSRF.
+  - Approval transaction sets claim status to `approved`, sets item status to `recovered`, sets `reviewer_id` and `reviewed_at`.
+  - Blocks subsequent approval attempts on other pending claims for that item and prevents new claims.
+  - Rejection transaction sets claim status to `rejected`, records reviewer and timestamp, leaves item open to receive other claims.
+  - Prevents already approved or rejected claims from being reviewed again.
+- [x] **User Claims Dashboard (`app/templates/claims/my_claims.html`)**:
+  - `GET /claims/my-claims`: Displays current user's submitted claims with pagination, status badges (Pending, Approved, Rejected), timestamps, and item links.
+  - Privacy preserved: claimants only view their own claims and proofs; unrelated users cannot view private verification details.
+  - Added "My Claims" link to the authenticated navigation bar and student dashboard widget.
+- [x] **Testing (`tests/test_claims.py`)**:
+  - 15 comprehensive tests covering all 12 required scenarios, form validations, and CSRF protection.
+  - Full test suite: **112 tests passing with 0 failures and 0 warnings**.
 

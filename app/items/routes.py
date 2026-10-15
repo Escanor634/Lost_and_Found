@@ -5,9 +5,11 @@ from flask_login import login_required, current_user
 
 from app.extensions import db
 from app.models.item import Item
+from app.models.claim import Claim
 from app.items import items_bp
 from app.items.forms import ItemReportForm, ItemEditForm
 from app.items.utils import validate_and_save_image, delete_item_image
+from app.claims.forms import ClaimActionForm
 
 
 @items_bp.route("/report", methods=["GET"])
@@ -115,7 +117,24 @@ def item_detail(item_id):
     item = db.session.get(Item, item_id)
     if not item:
         abort(404)
-    return render_template("items/detail.html", item=item)
+
+    user_claim = None
+    if current_user.is_authenticated:
+        user_claim = db.session.scalar(
+            db.select(Claim).filter(
+                Claim.item_id == item.id,
+                Claim.claimant_id == current_user.id,
+                Claim.status.in_(["pending", "approved"]),
+            )
+        )
+
+    action_form = ClaimActionForm()
+    return render_template(
+        "items/detail.html",
+        item=item,
+        user_claim=user_claim,
+        action_form=action_form,
+    )
 
 
 @items_bp.route("/<int:item_id>/edit", methods=["GET", "POST"])

@@ -61,6 +61,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'claims.my_claims' %}active{% endif %}" href="{{ url_for('claims.my_claims') }}">
+                            <i class="bi bi-shield-check me-1" aria-hidden="true"></i>My Claims
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'auth.profile' %}active{% endif %}" href="{{ url_for('auth.profile') }}">
                             <i class="bi bi-person me-1" aria-hidden="true"></i>Profile
                         </a>

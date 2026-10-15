@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}My Claims | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('auth.dashboard') }}" class="text-decoration-none">Student Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Claims</li>
+        </ol>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pb-3 mb-4 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle text-uppercase">
+                    Ownership Claims
+                </span>
+                <span class="text-muted small">({{ pagination.total }} {{ 'claim' if pagination.total == 1 else 'claims' }})</span>
+            </div>
+            <h1 class="h2 fw-bold mb-1">My Submitted Claims</h1>
+            <p class="text-muted small mb-0">
+                Track the verification status of claims you have filed for found items.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('items.found_items') }}" class="btn btn-outline-primary">
+                <i class="bi bi-search me-1" aria-hidden="true"></i> Browse Found Items
+            </a>
+        </div>
+    </div>
+
+    <!-- Claims Listing -->
+    {% if pagination.items %}
+    <div class="card campus-card shadow-sm border-0 mb-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted small text-uppercase">
+                    <tr>
+                        <th scope="col" style="min-width: 240px;">Claimed Item</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Date Claimed</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Your Proof Details</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for claim in pagination.items %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if claim.item.image_path %}
+                                <img src="{{ url_for('static', filename='uploads/' + claim.item.image_path) }}" 
+                                     alt="{{ claim.item.title }}" 
+                                     class="rounded border flex-shrink-0" 
+                                     style="width: 48px; height: 48px; object-fit: cover;">
+                                {% else %}
+                                <div class="rounded border bg-light d-flex align-items-center justify-content-center text-muted flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-tag" aria-hidden="true"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <a href="{{ url_for('items.item_detail', item_id=claim.item.id) }}" class="fw-semibold text-dark text-decoration-none">
+                                        {{ claim.item.title }}
+                                    </a>
+                                    <div class="text-muted small text-truncate max-w-200">
+                                        <i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ claim.item.location }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="small text-muted">{{ claim.item.category }}</span>
+                        </td>
+                        <td>
+                            <span class="small text-muted">{{ claim.created_at.strftime('%b %d, %Y') }}</span>
+                            <div class="small text-muted opacity-75">{{ claim.created_at.strftime('%I:%M %p') }}</div>
+                        </td>
+                        <td>
+                            {% if claim.status == 'pending' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                <i class="bi bi-hourglass-split me-1"></i>Pending Review
+                            </span>
+                            {% elif claim.status == 'approved' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                <i class="bi bi-check-circle me-1"></i>Approved
+                            </span>
+                            {% elif claim.status == 'rejected' %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                <i class="bi bi-x-circle me-1"></i>Rejected
+                            </span>
+                            {% elif claim.status == 'withdrawn' %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                <i class="bi bi-slash-circle me-1"></i>Withdrawn
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="small text-muted text-truncate max-w-300" title="{{ claim.proof_description }}">
+                                {{ claim.proof_description }}
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('items.item_detail', item_id=claim.item.id) }}" class="btn btn-outline-secondary btn-sm" title="View Item Details">
+                                <i class="bi bi-eye me-1" aria-hidden="true"></i> View Item
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{ 'disabled' if not pagination.has_prev else '' }}">
+                <a class="page-link" href="{{ url_for('claims.my_claims', page=pagination.prev_num) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo; Previous</span>
+                </a>
+            </li>
+            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if p %}
+                    <li class="page-item {{ 'active' if p == pagination.page else '' }}">
+                        <a class="page-link" href="{{ url_for('claims.my_claims', page=p) }}">{{ p }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                {% endif %}
+            {% endfor %}
+            <li class="page-item {{ 'disabled' if not pagination.has_next else '' }}">
+                <a class="page-link" href="{{ url_for('claims.my_claims', page=pagination.next_num) }}" aria-label="Next">
+                    <span aria-hidden="true">Next &raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Friendly Empty State -->
+    <div class="card campus-card shadow-sm border-0 text-center py-5 my-4">
+        <div class="card-body py-5">
+            <div class="step-icon mx-auto mb-3" style="background-color: var(--campus-light-gray); color: var(--campus-gray); width: 64px; height: 64px; font-size: 1.8rem;">
+                <i class="bi bi-shield-slash" aria-hidden="true"></i>
+            </div>
+            <h2 class="h4 fw-bold mb-2">You Haven't Submitted Any Claims Yet</h2>
+            <p class="text-muted small max-w-500 mx-auto mb-4">
+                If you lost an item on campus, search or browse through the catalog of found items. When you spot your belonging, click "Claim This Item" to submit proof of ownership to the finder.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('items.found_items') }}" class="btn btn-primary">
+                    <i class="bi bi-search me-1" aria-hidden="true"></i> Browse Found Items Catalog
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Claim {{ item.title }} | Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('items.found_items') }}" class="text-decoration-none">Found Items</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="text-decoration-none">{{ item.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Claim Item</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Item Brief Summary Card -->
+            <div class="card campus-card shadow-sm border-0 mb-4 bg-light">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        {% if item.image_path %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.image_path) }}" 
+                             alt="{{ item.title }}" 
+                             class="rounded border flex-shrink-0" 
+                             style="width: 72px; height: 72px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded border bg-white d-flex align-items-center justify-content-center text-muted flex-shrink-0" style="width: 72px; height: 72px;">
+                            <i class="bi bi-tag fs-2" aria-hidden="true"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <span class="badge badge-found text-uppercase mb-1">Found Item</span>
+                            <h2 class="h5 fw-bold mb-1">{{ item.title }}</h2>
+                            <div class="text-muted small">
+                                <span><i class="bi bi-geo-alt me-1"></i>{{ item.location }}</span>
+                                <span class="ms-3"><i class="bi bi-calendar-event me-1"></i>Found on {{ item.incident_date.strftime('%B %d, %Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ownership Claim Form Card -->
+            <div class="card campus-card shadow-sm border-0 mb-5">
+                <div class="card-header bg-white border-bottom p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="step-icon mb-0" style="background-color: var(--campus-found-light); color: var(--campus-found);">
+                            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <h1 class="h4 fw-bold mb-1">Claim This Item</h1>
+                            <p class="text-muted small mb-0">
+                                Submit verifiable proof to prove ownership to the person who found this item.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="alert alert-info border-info-subtle d-flex align-items-start gap-2 mb-4" role="alert">
+                        <i class="bi bi-info-circle-fill text-info mt-1 flex-shrink-0"></i>
+                        <div class="small">
+                            <strong>Verification Guidance:</strong>
+                            <ul class="mb-0 ps-3 mt-1">
+                                <li><strong>Why do you believe this item belongs to you?</strong> (e.g., when and where you lost it)</li>
+                                <li><strong>What details can you provide to verify ownership?</strong> (e.g., unique scratches, serial number, lock screen photo, internal bag contents, or distinguishing features not visible in public photos)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('claims.submit_claim', item_id=item.id) }}" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Proof Description Textarea -->
+                        <div class="mb-4">
+                            {{ form.proof_description.label(class="form-label fw-semibold") }}
+                            <div class="has-validation">
+                                {{ form.proof_description(class="form-control" + (" is-invalid" if form.proof_description.errors else ""), rows="6", placeholder="Provide detailed proof of ownership:\n1. Why do you believe this item belongs to you?\n2. What private details can you provide to verify ownership (e.g., unique marks, serial numbers, specific contents, lock combinations)?", required=True) }}
+                                {% for error in form.proof_description.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text text-muted small mt-2">
+                                <i class="bi bi-lock me-1"></i>
+                                This information is private and will only be shared with the student who reported finding the item.
+                            </div>
+                        </div>
+
+                        <!-- Submit and Cancel Buttons -->
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+                            <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Cancel &amp; Return
+                            </a>
+                            <button type="submit" class="btn btn-success px-4 fw-semibold">
+                                <i class="bi bi-shield-check me-1" aria-hidden="true"></i> Submit Ownership Claim
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
